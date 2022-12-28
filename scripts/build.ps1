@@ -5,7 +5,6 @@ if (!($Env:IsVarActive)) {
 	throw "Variables is not setup"
 }
 
-
 # setting up build log file
 $Logfile = "$Env:LogFolder/$Env:ProjectName" +
 		   (Get-Date).toString("ddMMyyyy_HH-mm-ss") +
@@ -21,10 +20,6 @@ function WriteLog {
 	}
 	Add-content $LogFile -value $LogMessage
 }
-
-
-# write first record to log
-WriteLog "Virables activated, build log started at $Env:LogFolder"
 
 function InitPython() {
 	# Create virtual evnirement if it is not created
@@ -152,13 +147,8 @@ function BuildProject() {
 	}
 }
 
-
-# -init init python
-# -generate generate project
-# -build build project
-# -cproject clear project
-# -call clear all
-# -clog clear log
+# write first record to log
+WriteLog "Virables activated, build log started at $Env:LogFolder"
 
 if ($args.Contains("-init")) {
 	InitPython
