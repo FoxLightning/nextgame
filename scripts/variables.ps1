@@ -8,6 +8,14 @@ $Env:ProjectName = "nextgame"
 $Env:BuildPath = $Env:ProjectPath + $Env:DirSeparator + "build"
 $Env:DefaultGenerator = "Visual Studio 17 2022";
 
+$Env:Instruction = "Instruction: " +
+				   "[-init] init python, " +
+				   "[-generate] generate project, " +
+				   "[-build] build project, " +
+				   "[-cproject] clear project, " +
+				   "[-call] clear all, " +
+				   "[-help] show this message, " +
+				   "[-clog] clear log."
 
 # log variables
 $Env:TimeStamp = "[dd.MM HH:mm:ss]"
