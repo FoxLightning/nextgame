@@ -29,7 +29,7 @@ function LogPreviousCommandStatus {
 	} else {
 		$ErrorMesage = "Result with error code: $LASTEXITCODE"
 		WriteLog $ErrorMesage
-		if (!(RiseError -eq 0))
+		if (!($RiseError -eq 0))
 		{
 			throw $ErrorMesage
 		}
@@ -77,10 +77,11 @@ function CleanPython {
 	WriteLog "Removing venv folder";
 	if (Test-Path -Path $Env:VenvPath) {
 		Remove-Item $Env:VenvPath -Recurse
+		LogPreviousCommandStatus
 	} else {
 		WriteLog "Venv is already removed";
 	}
-	LogPreviousCommandStatus
+
 }
 
 function CleanLog {

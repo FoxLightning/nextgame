@@ -1,6 +1,5 @@
 [requires]
 sfml/2.5.1
-box2d/2.4.1
 
 [generators]
 cmake
