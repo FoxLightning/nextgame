@@ -88,26 +88,47 @@ float GetVectorLength(const sf::Vector2f& in_Vector)
 
 void ResolveCollisions(Unit& lhunit, Unit& rhunit)
 {
-    const sf::Vector2f current_vector_distance = lhunit.target_position_ - rhunit.target_position_;
-    const float desired_scalar_distance = lhunit.GetSize() + rhunit.GetSize();
-    const float current_scalar_distance = GetVectorLength(current_vector_distance);
-    if (current_scalar_distance < desired_scalar_distance)
-    {
-        const float delta_distance = desired_scalar_distance - current_scalar_distance;
-        
-        sf::Vector2f direction_vector = sf::Vector2f(1, 0); 
-        if (current_scalar_distance > 0.001f)
+    { // target
+        const sf::Vector2f current_vector_distance = lhunit.target_position_ - rhunit.target_position_;
+        const float desired_scalar_distance = lhunit.GetSize() + rhunit.GetSize();
+        const float current_scalar_distance = GetVectorLength(current_vector_distance);
+        if (current_scalar_distance < desired_scalar_distance)
         {
-            direction_vector = GetDirectionVector(current_vector_distance); 
+            const float delta_distance = desired_scalar_distance - current_scalar_distance;
+            
+            sf::Vector2f direction_vector = sf::Vector2f(1, 0); 
+            if (current_scalar_distance > 0.001f)
+            {
+                direction_vector = GetDirectionVector(current_vector_distance); 
+            }
+            else
+            {
+                direction_vector = GetDirectionVector(lhunit.GetPosition() - rhunit.GetPosition());
+            }
+            direction_vector *= delta_distance/2;
+            
+            lhunit.target_position_ += direction_vector;
+            rhunit.target_position_ -= direction_vector;
         }
-        else
+    }
+    { // cur pos
+        const sf::Vector2f current_vector_distance = lhunit.current_position_ - rhunit.current_position_;
+        const float desired_scalar_distance = lhunit.GetSize() + rhunit.GetSize();
+        const float current_scalar_distance = GetVectorLength(current_vector_distance);
+        if (current_scalar_distance < desired_scalar_distance)
         {
-            direction_vector = GetDirectionVector(lhunit.GetPosition() - rhunit.GetPosition());
+            const float delta_distance = desired_scalar_distance - current_scalar_distance;
+            
+            sf::Vector2f direction_vector = sf::Vector2f(1, 0); 
+            if (current_scalar_distance > 0.001f)
+            {
+                direction_vector = GetDirectionVector(current_vector_distance); 
+            }
+            direction_vector *= delta_distance/2;
+            
+            lhunit.current_position_ += direction_vector;
+            rhunit.current_position_ -= direction_vector;
         }
-        direction_vector *= delta_distance/2;
-        
-        lhunit.target_position_ += direction_vector;
-        rhunit.target_position_ -= direction_vector;
     }
 }
 
