@@ -1,7 +1,8 @@
 #### Build workflow
 
 1. Install Pyhton 3 https://www.python.org/downloads/
-2. Run build script
+2. Make sure that PowerShell installed and works correctly. ```Set-ExecutionPolicy -ExecutionPolicy Bypass```
+4. Run build script
 ``` PS1
 .\scripts\build.ps1 -init -generate -build
 ```
