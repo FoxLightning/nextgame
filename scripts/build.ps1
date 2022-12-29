@@ -129,27 +129,26 @@ function CleanAll {
 	CleanLog
 }
 
+function ShowHelp {
+	Write-Output $Env:Instruction
+}
+
+function InvalidArgumentMessage {
+	WriteLog "Invalid argument: '$arg'"
+	ShowHelp
+}
+
 # write first record to log
 WriteLog "Virables activated, build log started at $Env:LogFolder"
 
 foreach ($arg in $args) {
-	if ($arg -eq "-init") {
-		InitPython
-	} elseif ($arg -eq "-generate") {
-		GenerateProject
-	} elseif ($arg -eq "-build") {
-		BuildProject
-	} elseif ($arg -eq "-generate") {
-		GenerateProject
-	} elseif ($arg -eq "-clog") {
-		CleanLog
-	} elseif ($arg -eq "-call") {
-		CleanAll
-	} elseif ($arg -eq "-help") {
-		Write-Output $Env:Instruction
-	} else {
-		WriteLog "Invalid argument: '$arg'"
-		Write-Output $Env:Instruction
-		break
+	switch ($arg) {
+		"-init" { InitPython }
+		"-generate" { GenerateProject }
+		"-build" { BuildProject }
+		"-clog" { CleanLog }
+		"-call" { CleanAll }
+		"-help" { ShowHelp }
+		Default { InvalidArgumentMessage }
 	}
 }
