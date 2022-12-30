@@ -149,6 +149,7 @@ foreach ($arg in $args) {
 		"-build" { BuildProject }
 		"-clog" { CleanLog }
 		"-call" { CleanAll }
+		"-cproject" { CleanGeneratedProject }
 		"-help" { ShowHelp }
 		Default { InvalidArgumentMessage }
 	}
