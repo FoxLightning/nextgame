@@ -115,7 +115,7 @@ void ResolveCollisions(Unit* lhunit, Unit* rhunit)
         {
             const float delta_distance = desired_scalar_distance - current_scalar_distance;
 
-            sf::Vector2f direction_vector = sf::Vector2f(1, 0);
+            sf::Vector2f direction_vector;
             if (current_scalar_distance > 0.001f)
             {
                 direction_vector = GetDirectionVector(current_vector_distance);
@@ -160,7 +160,7 @@ void KeepMouseInWindow(sf::RenderWindow& window)
     }
     const sf::Vector2i WindowSize = static_cast<sf::Vector2i>(window.getSize());
     sf::Vector2i MousePosition = sf::Mouse::getPosition(window);
-    const int offset = 10;
+    constexpr int offset = 10;
     if (MousePosition.x < offset)
     {
         MousePosition.x = offset;
@@ -188,6 +188,22 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode(ScreenWidth, ScreenHeight), "SFML works!");
 
+    // view
+    // create a view with its center and size
+    sf::View view(sf::Vector2f(ScreenWidth /2, ScreenHeight/2), sf::Vector2f(ScreenWidth, ScreenHeight));
+    view.setViewport(sf::FloatRect(0, 0, 1.f, 1.f));
+    window.setView(view);
+    // end view
+
+    // terrain 
+    sf::Texture t;
+    t.setRepeated(true);
+    if (!t.loadFromFile("D:/Projects/nextgame/content/t_terrain.png"))
+    {
+        std::cout << "Texture load felure" << std::endl;
+    }
+    sf::Sprite s(t, sf::IntRect(0, 0, 64 * 15, 64 * 10));
+    // end terrain
 
     sf::RectangleShape HighlightBox(sf::Vector2f(10, 10));
     HighlightBox.setPosition(0, 0);
@@ -212,7 +228,7 @@ int main()
                 window.close();
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             {
-                auto MousePosition = sf::Vector2f(sf::Mouse::getPosition(window));
+                sf::Vector2f MousePosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) + static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
                 for (Unit* unit : UnitsList)
                 {
                     if (unit->IsSelected())
@@ -235,15 +251,15 @@ int main()
                     }
                 }
             }
-            // keep mouse in window
-
-
+            
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
                 sf::Vector2i MousePosition = sf::Mouse::getPosition(window);
                 if (!HighlightBoxActive)
                 {
-                    HighlightBox.setPosition(sf::Vector2f(MousePosition));
+                    sf::Vector2f MouseWorldPosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) + static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                    HighlightBox.setPosition(MouseWorldPosition - HighlightBox.getPosition());
+ 
                     HighlightBoxActive = true;
                     for (Unit* unit : UnitsList)
                     {
@@ -252,7 +268,8 @@ int main()
                 }
                 else
                 {
-                    HighlightBox.setSize(sf::Vector2f(MousePosition) - HighlightBox.getPosition());
+                    sf::Vector2f MouseWorldPosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) + static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                    HighlightBox.setSize(MouseWorldPosition - HighlightBox.getPosition());
                 }
             }
             else
@@ -262,24 +279,16 @@ int main()
                     const sf::Vector2f UnitPosition = unit->GetPosition();
                     if (HighlightBox.getSize().x > 0)
                     {
-                        if (UnitPosition.x > HighlightBox.getPosition().x && UnitPosition.x < HighlightBox.
-                            getPosition()
-                            .x + HighlightBox.getSize().x)
-                        {
-                        }
-                        else
+                        if (!(UnitPosition.x > HighlightBox.getPosition().x &&
+                            UnitPosition.x < HighlightBox.getPosition().x + HighlightBox.getSize().x))
                         {
                             continue;
                         }
                     }
                     else
                     {
-                        if (UnitPosition.x > HighlightBox.getPosition().x + HighlightBox.getSize().x && UnitPosition
-                            .x <
-                            HighlightBox.getPosition().x)
-                        {
-                        }
-                        else
+                        if (!(UnitPosition.x > HighlightBox.getPosition().x + HighlightBox.getSize().x &&
+                            UnitPosition.x < HighlightBox.getPosition().x))
                         {
                             continue;
                         }
@@ -287,18 +296,16 @@ int main()
 
                     if (HighlightBox.getSize().y > 0)
                     {
-                        if (UnitPosition.y > HighlightBox.getPosition().y && UnitPosition.y < HighlightBox.
-                            getPosition()
-                            .y + HighlightBox.getSize().y)
+                        if (UnitPosition.y > HighlightBox.getPosition().y &&
+                            UnitPosition.y < HighlightBox.getPosition().y + HighlightBox.getSize().y)
                         {
                             unit->Select();
                         }
                     }
                     else
                     {
-                        if (UnitPosition.y > HighlightBox.getPosition().y + HighlightBox.getSize().y && UnitPosition
-                            .y <
-                            HighlightBox.getPosition().y)
+                        if (UnitPosition.y > HighlightBox.getPosition().y + HighlightBox.getSize().y
+                            && UnitPosition.y < HighlightBox.getPosition().y)
                         {
                             unit->Select();
                         }
@@ -309,7 +316,36 @@ int main()
                 HighlightBoxActive = false;
             }
         }
-
+        if (window.hasFocus())
+        { // on mouse get border
+            const int camera_speed = 3;
+            
+            const sf::Vector2i WindowSize = static_cast<sf::Vector2i>(window.getSize());
+            sf::Vector2i MousePosition = sf::Mouse::getPosition(window);
+            constexpr int offset = 10;
+            if (MousePosition.x < offset)
+            {
+                MousePosition.x = offset;
+                view.move(sf::Vector2f(-1 * camera_speed, 0));
+            }
+            if (MousePosition.y < offset)
+            {
+                MousePosition.y = offset;
+                view.move(sf::Vector2f(0, -1 * camera_speed));
+            }
+            if (MousePosition.x > WindowSize.x - offset)
+            {
+                MousePosition.x = WindowSize.x - offset;
+                view.move(sf::Vector2f(camera_speed, 0));
+            }
+            if (MousePosition.y > WindowSize.y - offset)
+            {
+                MousePosition.y = WindowSize.y - offset;
+                view.move(sf::Vector2f(0, camera_speed));
+            }
+            window.setView(view);
+            sf::Mouse::setPosition(MousePosition, window);
+        }
         KeepMouseInWindow(window);
         for (size_t i = 0; i < UnitsList.size(); i++)
         {
@@ -319,6 +355,7 @@ int main()
             }
         }
         window.clear();
+        window.draw(s);
         window.draw(HighlightBox);
 
         for (Unit* unit : UnitsList)
