@@ -152,6 +152,34 @@ void ResolveCollisions(Unit* lhunit, Unit* rhunit)
     }
 }
 
+void KeepMouseInWindow(sf::RenderWindow& window)
+{
+    if (!window.hasFocus())
+    {
+        return;
+    }
+    const sf::Vector2i WindowSize = static_cast<sf::Vector2i>(window.getSize());
+    sf::Vector2i MousePosition = sf::Mouse::getPosition(window);
+    const int offset = 10;
+    if (MousePosition.x < offset)
+    {
+        MousePosition.x = offset;
+    }
+    if (MousePosition.y < offset)
+    {
+        MousePosition.y = offset;
+    }
+    if (MousePosition.x > WindowSize.x - offset)
+    {
+        MousePosition.x = WindowSize.x - offset;
+    }
+    if (MousePosition.y > WindowSize.y - offset)
+    {
+        MousePosition.y = WindowSize.y - offset;
+    }
+    sf::Mouse::setPosition(MousePosition, window);
+}
+
 int main()
 {
     int ScreenWidth = 800;
@@ -207,6 +235,8 @@ int main()
                     }
                 }
             }
+            // keep mouse in window
+
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
@@ -232,7 +262,8 @@ int main()
                     const sf::Vector2f UnitPosition = unit->GetPosition();
                     if (HighlightBox.getSize().x > 0)
                     {
-                        if (UnitPosition.x > HighlightBox.getPosition().x && UnitPosition.x < HighlightBox.getPosition()
+                        if (UnitPosition.x > HighlightBox.getPosition().x && UnitPosition.x < HighlightBox.
+                            getPosition()
                             .x + HighlightBox.getSize().x)
                         {
                         }
@@ -243,7 +274,8 @@ int main()
                     }
                     else
                     {
-                        if (UnitPosition.x > HighlightBox.getPosition().x + HighlightBox.getSize().x && UnitPosition.x <
+                        if (UnitPosition.x > HighlightBox.getPosition().x + HighlightBox.getSize().x && UnitPosition
+                            .x <
                             HighlightBox.getPosition().x)
                         {
                         }
@@ -255,7 +287,8 @@ int main()
 
                     if (HighlightBox.getSize().y > 0)
                     {
-                        if (UnitPosition.y > HighlightBox.getPosition().y && UnitPosition.y < HighlightBox.getPosition()
+                        if (UnitPosition.y > HighlightBox.getPosition().y && UnitPosition.y < HighlightBox.
+                            getPosition()
                             .y + HighlightBox.getSize().y)
                         {
                             unit->Select();
@@ -263,7 +296,8 @@ int main()
                     }
                     else
                     {
-                        if (UnitPosition.y > HighlightBox.getPosition().y + HighlightBox.getSize().y && UnitPosition.y <
+                        if (UnitPosition.y > HighlightBox.getPosition().y + HighlightBox.getSize().y && UnitPosition
+                            .y <
                             HighlightBox.getPosition().y)
                         {
                             unit->Select();
@@ -276,6 +310,7 @@ int main()
             }
         }
 
+        KeepMouseInWindow(window);
         for (size_t i = 0; i < UnitsList.size(); i++)
         {
             for (size_t j = i + 1; j < UnitsList.size(); j++)
