@@ -1,0 +1,73 @@
+#####
+class GInstance // init and update objects
+public:
+	GInstance() // initialize some things
+	{
+		0. Load assets
+		1. Crate World
+			create Game mode
+		2. Crate Player
+			create UI
+	}
+
+	void Update() { foreach Object in GameObjects { Object.Update(float delta); }}
+private:
+	GIObject GameObjects[..]
+	GWorld CurrentWorld
+
+#####
+class GIObject // object wich should be updated
+	GIObject() { register to GI}
+public:
+	virtual void Update(delta) = 0 // update pattern implementation
+
+
+##### // store world object wich should be rendered
+class GWorld // gworld not a GIObject because it should be updated in a specific order
+public:
+	GWorld() // initialize map and game mode
+
+	void RegisterObject(WObject* Object)
+	virtual void Update(delta) override {render objects}
+	WObject[] GetObject();
+
+private:
+	WObject ParentObject[]
+	GMode GameMode
+	GPlayer CurrentPlayer
+
+##### // store game scripts
+class GMode // gmode not a GIObject because it should be updated in a specific order
+public:
+	Update()
+	
+
+
+##### // object should be rendered and calculated
+class WObject public GIObject
+	explicit WObject(GWorld* ParentWorld) // register in World
+
+##### 
+class WInteract public WObject // world interactive object - object wich can highlight
+...
+
+##### // object wich can be controlled by player
+class WPawn public WObject
+
+
+##### // represent player, handle controller actions
+class GPlayer
+public
+private:
+	UIManager
+	GCamera
+	GController
+
+#####
+class UIManager // menege ui object handle controller events
+
+#####
+class GCamera // represent camera in world
+
+####
+class GControlelr // map input to action
