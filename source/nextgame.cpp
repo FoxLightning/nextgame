@@ -2,18 +2,20 @@
 #include <SFML/Graphics.hpp>
 // std
 #include <cmath>
-#include <vector>
 #include <iostream>
+#include <vector>
+
+#include "GameInstance.h"
 
 class Unit
 {
 public:
     sf::CircleShape shape_;
-    sf::Sprite sprite_;
-    sf::Texture texture;
-    float max_speed_ = 0.1f;
-    float unit_size = 20.f;
-    bool is_selected = false;
+    sf::Sprite      sprite_;
+    sf::Texture     texture;
+    float           max_speed_  = 0.1f;
+    float           unit_size   = 20.f;
+    bool            is_selected = false;
 
     sf::Vector2f current_position_;
     sf::Vector2f target_position_;
@@ -22,7 +24,7 @@ public:
     explicit Unit(sf::Vector2f in_position)
     {
         current_position_ = in_position;
-        target_position_ = in_position;
+        target_position_  = in_position;
 
         // Declare and load a texture
         if (!texture.loadFromFile("D:\\Projects\\nextgame\\content\\unit_sprite.png", sf::IntRect(0, 0, 40, 40)))
@@ -43,12 +45,30 @@ public:
         shape_.setOrigin(20, 20);
     }
 
-    sf::Vector2f GetPosition() const { return current_position_; }
-    bool IsSelected() const { return is_selected; }
-    float GetSize() const { return unit_size; }
-    void Select() { is_selected = true; }
-    void Unselect() { is_selected = false; }
-    void Move(sf::Vector2f delta) { current_position_ += delta; }
+    sf::Vector2f GetPosition() const
+    {
+        return current_position_;
+    }
+    bool IsSelected() const
+    {
+        return is_selected;
+    }
+    float GetSize() const
+    {
+        return unit_size;
+    }
+    void Select()
+    {
+        is_selected = true;
+    }
+    void Unselect()
+    {
+        is_selected = false;
+    }
+    void Move(sf::Vector2f delta)
+    {
+        current_position_ += delta;
+    }
 
     ~Unit()
     {
@@ -71,8 +91,7 @@ public:
         if (current_position_ != target_position_)
         {
             const sf::Vector2f distance_vector = target_position_ - current_position_;
-            const auto vector_length = static_cast<float>(sqrt(pow(distance_vector.x, 2) +
-                pow(distance_vector.y, 2)));
+            const auto vector_length = static_cast<float>(sqrt(pow(distance_vector.x, 2) + pow(distance_vector.y, 2)));
             if (vector_length > unit_size / 2.f)
             {
                 const sf::Vector2f delta_vector = (distance_vector / vector_length) * max_speed_;
@@ -109,8 +128,8 @@ void ResolveCollisions(Unit* lhunit, Unit* rhunit)
     {
         // target
         const sf::Vector2f current_vector_distance = lhunit->target_position_ - rhunit->target_position_;
-        const float desired_scalar_distance = lhunit->GetSize() + rhunit->GetSize();
-        const float current_scalar_distance = GetVectorLength(current_vector_distance);
+        const float        desired_scalar_distance = lhunit->GetSize() + rhunit->GetSize();
+        const float        current_scalar_distance = GetVectorLength(current_vector_distance);
         if (current_scalar_distance < desired_scalar_distance)
         {
             const float delta_distance = desired_scalar_distance - current_scalar_distance;
@@ -133,8 +152,8 @@ void ResolveCollisions(Unit* lhunit, Unit* rhunit)
     {
         // cur pos
         const sf::Vector2f current_vector_distance = lhunit->current_position_ - rhunit->current_position_;
-        const float desired_scalar_distance = lhunit->GetSize() + rhunit->GetSize();
-        const float current_scalar_distance = GetVectorLength(current_vector_distance);
+        const float        desired_scalar_distance = lhunit->GetSize() + rhunit->GetSize();
+        const float        current_scalar_distance = GetVectorLength(current_vector_distance);
         if (current_scalar_distance < desired_scalar_distance)
         {
             const float delta_distance = desired_scalar_distance - current_scalar_distance;
@@ -158,9 +177,9 @@ void KeepMouseInWindow(sf::RenderWindow& window)
     {
         return;
     }
-    const sf::Vector2i WindowSize = static_cast<sf::Vector2i>(window.getSize());
-    sf::Vector2i MousePosition = sf::Mouse::getPosition(window);
-    constexpr int offset = 10;
+    const sf::Vector2i WindowSize    = static_cast<sf::Vector2i>(window.getSize());
+    sf::Vector2i       MousePosition = sf::Mouse::getPosition(window);
+    constexpr int      offset        = 10;
     if (MousePosition.x < offset)
     {
         MousePosition.x = offset;
@@ -182,20 +201,21 @@ void KeepMouseInWindow(sf::RenderWindow& window)
 
 int main()
 {
-    int ScreenWidth = 800;
-    int ScreenHeight = 600;
+    auto gameinstance = GameInstance();
+    int  ScreenWidth  = 800;
+    int  ScreenHeight = 600;
 
 
     sf::RenderWindow window(sf::VideoMode(ScreenWidth, ScreenHeight), "SFML works!");
 
     // view
     // create a view with its center and size
-    sf::View view(sf::Vector2f(ScreenWidth /2, ScreenHeight/2), sf::Vector2f(ScreenWidth, ScreenHeight));
+    sf::View view(sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2), sf::Vector2f(ScreenWidth, ScreenHeight));
     view.setViewport(sf::FloatRect(0, 0, 1.f, 1.f));
     window.setView(view);
     // end view
 
-    // terrain 
+    // terrain
     sf::Texture t;
     t.setRepeated(true);
     if (!t.loadFromFile("D:/Projects/nextgame/content/t_terrain.png"))
@@ -228,7 +248,8 @@ int main()
                 window.close();
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             {
-                sf::Vector2f MousePosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) + static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                sf::Vector2f MousePosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) +
+                                             static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
                 for (Unit* unit : UnitsList)
                 {
                     if (unit->IsSelected())
@@ -236,7 +257,7 @@ int main()
                         unit->set_target(MousePosition);
 
                         const sf::Vector2f directionVector = MousePosition - unit->GetPosition();
-                        const float rotation = atan(directionVector.y / directionVector.x);
+                        const float        rotation        = atan(directionVector.y / directionVector.x);
 
                         float end_rotation = rotation * 57.295779513f;
                         if (directionVector.x < 0 && directionVector.y < 0)
@@ -251,15 +272,16 @@ int main()
                     }
                 }
             }
-            
+
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
                 sf::Vector2i MousePosition = sf::Mouse::getPosition(window);
                 if (!HighlightBoxActive)
                 {
-                    sf::Vector2f MouseWorldPosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) + static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                    sf::Vector2f MouseWorldPosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) +
+                                                      static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
                     HighlightBox.setPosition(MouseWorldPosition - HighlightBox.getPosition());
- 
+
                     HighlightBoxActive = true;
                     for (Unit* unit : UnitsList)
                     {
@@ -268,7 +290,8 @@ int main()
                 }
                 else
                 {
-                    sf::Vector2f MouseWorldPosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) + static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                    sf::Vector2f MouseWorldPosition = view.getCenter() - sf::Vector2f(ScreenWidth / 2, ScreenHeight / 2) +
+                                                      static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
                     HighlightBox.setSize(MouseWorldPosition - HighlightBox.getPosition());
                 }
             }
@@ -280,7 +303,7 @@ int main()
                     if (HighlightBox.getSize().x > 0)
                     {
                         if (!(UnitPosition.x > HighlightBox.getPosition().x &&
-                            UnitPosition.x < HighlightBox.getPosition().x + HighlightBox.getSize().x))
+                              UnitPosition.x < HighlightBox.getPosition().x + HighlightBox.getSize().x))
                         {
                             continue;
                         }
@@ -288,7 +311,7 @@ int main()
                     else
                     {
                         if (!(UnitPosition.x > HighlightBox.getPosition().x + HighlightBox.getSize().x &&
-                            UnitPosition.x < HighlightBox.getPosition().x))
+                              UnitPosition.x < HighlightBox.getPosition().x))
                         {
                             continue;
                         }
@@ -304,8 +327,8 @@ int main()
                     }
                     else
                     {
-                        if (UnitPosition.y > HighlightBox.getPosition().y + HighlightBox.getSize().y
-                            && UnitPosition.y < HighlightBox.getPosition().y)
+                        if (UnitPosition.y > HighlightBox.getPosition().y + HighlightBox.getSize().y &&
+                            UnitPosition.y < HighlightBox.getPosition().y)
                         {
                             unit->Select();
                         }
@@ -319,10 +342,10 @@ int main()
         if (window.hasFocus())
         { // on mouse get border
             const int camera_speed = 3;
-            
-            const sf::Vector2i WindowSize = static_cast<sf::Vector2i>(window.getSize());
-            sf::Vector2i MousePosition = sf::Mouse::getPosition(window);
-            constexpr int offset = 10;
+
+            const sf::Vector2i WindowSize    = static_cast<sf::Vector2i>(window.getSize());
+            sf::Vector2i       MousePosition = sf::Mouse::getPosition(window);
+            constexpr int      offset        = 10;
             if (MousePosition.x < offset)
             {
                 MousePosition.x = offset;
