@@ -139,6 +139,12 @@ function InvalidArgumentMessage {
 	ShowHelp
 }
 
+function Run {
+	WriteLog "Start app in detached process"
+	Start-Process -FilePath "build/bin/nextgame.exe"
+	LogPreviousCommandStatus
+}
+
 # write first record to log
 WriteLog "Virables activated, build log started at $Env:LogFolder"
 
@@ -151,6 +157,7 @@ foreach ($arg in $args) {
 		"-call" { CleanAll }
 		"-cproject" { CleanGeneratedProject }
 		"-help" { ShowHelp }
+		"-runWin" { Run }
 		Default { InvalidArgumentMessage }
 	}
 }
