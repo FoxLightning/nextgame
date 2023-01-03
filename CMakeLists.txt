@@ -1,5 +1,8 @@
 project(nextgame)
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.23.2)
+# enable std::format
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
 
 # setup conan
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -10,7 +13,7 @@ set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include_directories(source/public)
 # parse source files
 file(GLOB SOURCES source/private/*.cpp)
-file(GLOB HEADERS source/public/*.h)
+file(GLOB HEADERS source/public/*.hpp)
 
 # add executable files
 add_executable(nextgame ${HEADERS} ${SOURCES} source/nextgame.cpp)
