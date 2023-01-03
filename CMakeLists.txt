@@ -2,7 +2,10 @@ project(nextgame)
 cmake_minimum_required(VERSION 3.23.2)
 # enable std::format
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
+endif()
+
 
 # setup conan
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
